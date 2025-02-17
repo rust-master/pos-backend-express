@@ -1,1 +1,20 @@
 # pos-backend-express
+
+### .env file
+```
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_NAME=point_of_sale_db
+DB_PASSWORD=REPLACE_HERE
+DB_DIALECT=postgres
+
+JWT_SECRET=REPLACE_HERE
+JWT_EXPIRES=1d
+
+SESSION_SECRET=REPLACE_HERE
+
+GOOGLE_CLIENT_ID=REPLACE_HERE
+GOOGLE_CLIENT_SECRET=REPLACE_HERE
+GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
+```
