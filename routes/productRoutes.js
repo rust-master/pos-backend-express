@@ -30,6 +30,9 @@ router.get('/products/:id', productController.getProductById);
 router.put('/products/:id', authenticateJWT, authorizeRole(true), upload.single('image'), productController.updateProduct);
 // router.put('/products/:id', authenticateJWT, authorizeRole(true), productController.updateProduct);
 
+// Update Product Quantity
+router.patch('/products/:id/quantity', authenticateJWT, authorizeRole(true), productController.updateProductQuantity);
+
 // Delete Product (Admin Only)
 router.delete('/products/:id', authenticateJWT, authorizeRole(true), productController.deleteProduct);
 

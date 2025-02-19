@@ -5,6 +5,7 @@ const sequelize = require('../config/database');
 const User = require('../models/User');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
+const OrderItems = require('../models/OrderItems');
 
 const ENCRYPTION_KEY = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
 const IV_LENGTH = 16;
@@ -34,11 +35,13 @@ const backupDatabase = async (req, res) => {
         const users = await User.findAll();
         const products = await Product.findAll();
         const orders = await Order.findAll();
+        const orderItems = await OrderItems.findAll();
 
         const backupData = {
             users,
             products,
-            orders
+            orders,
+            orderItems
         };
 
         const encryptedData = encrypt(JSON.stringify(backupData));
@@ -74,6 +77,9 @@ const restoreDatabase = async (req, res) => {
 
         // Restore Orders
         await Order.bulkCreate(decryptedData.orders);
+
+        // Restore Orders
+        await OrderItems.bulkCreate(decryptedData.orderItems);
 
         res.status(200).json({ message: '✅ Database restored successfully!' });
     } catch (err) {

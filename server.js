@@ -10,6 +10,7 @@ const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const backupRoutes = require('./routes/backupRoutes');
+const salesRoutes = require('./routes/salesRoutes');
 
 const { stockCheckerCronJob } = require('./jobs/stockCheckerCronJob');
 
@@ -35,6 +36,7 @@ app.use('/api', authRoutes);
 app.use('/api', productRoutes);
 app.use('/api', orderRoutes);
 app.use('/api', backupRoutes);
+app.use('/api', salesRoutes);
 
 // Error Handling
 app.use((err, req, res, next) => {

@@ -11,7 +11,7 @@ const stockCheckerCronJob = () => {
             // Find products where quantity ≤ 5
             const lowStockProducts = await Product.findAll({
                 where: {
-                    quantity: { [Op.lte]: 100 }
+                    quantity: { [Op.lte]: 5 }
                 }
             });
 

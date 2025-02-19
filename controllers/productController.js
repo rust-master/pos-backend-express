@@ -92,6 +92,32 @@ const updateProduct = async (req, res) => {
     }
 };
 
+const updateProductQuantity = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { quantity } = req.body;
+        console.log("🚀 ~ updateProductQuantity ~ quantity:", quantity);
+
+        if (!quantity || isNaN(quantity)) {
+            return res.status(400).json({ message: 'Invalid quantity value' });
+        }
+
+        const product = await Product.findByPk(id);
+
+        if (!product) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
+
+        product.quantity += quantity;
+
+        await product.save();
+
+        return res.status(200).json({ message: 'Product quantity updated successfully', product });
+    } catch (error) {
+        return res.status(500).json({ message: 'Server error', error: error.message });
+    }
+};
+
 // ✅ Delete Product (Admin Only)
 const deleteProduct = async (req, res) => {
     try {
@@ -112,5 +138,6 @@ module.exports = {
     getAllProducts,
     getProductById,
     updateProduct,
+    updateProductQuantity,
     deleteProduct
 };
