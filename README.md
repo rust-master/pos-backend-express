@@ -9,6 +9,13 @@ DB_NAME=point_of_sale_db
 DB_PASSWORD=REPLACE_HERE
 DB_DIALECT=postgres
 
+// Production database
+PGHOST=''
+PGDATABASE=''
+PGUSER=''
+PGPASSWORD=''
+PGDIALECT=postgres
+
 JWT_SECRET=REPLACE_HERE
 JWT_EXPIRES=1d
 
