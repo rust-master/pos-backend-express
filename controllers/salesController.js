@@ -5,7 +5,7 @@ const Product = require('../models/Product');
 const PdfPrinter = require('pdfmake');
 const fs = require('fs');
 const htmlPdf = require('html-pdf');
-const { generateCustomPdf, generateMonthlySalesPdf, generateWeekllySalesPdf, generateDailySalesPdf } = require('../utils/pdfGenerator');
+const { generateCustomPdf, generateMonthlySalesPdf, generateWeeklySalesPdf, generateDailySalesPdf } = require('../utils/pdfGenerator');
 
 // 🗓️ Get Daily Sales Report (with Order Items & Product Info)
 const getDailySales = async (req, res) => {
