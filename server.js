@@ -11,10 +11,14 @@ const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const backupRoutes = require('./routes/backupRoutes');
 const salesRoutes = require('./routes/salesRoutes');
+const supplierRoutes = require('./routes/supplierRoutes');
+const inventoryPurchaseRoutes = require('./routes/inventoryPurchaseRoutes');
 
 const { stockCheckerCronJob } = require('./jobs/stockCheckerCronJob');
+const { backupCronJob } = require('./jobs/backupCronJob');
 
 stockCheckerCronJob();
+// backupCronJob();
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -37,6 +41,8 @@ app.use('/api', productRoutes);
 app.use('/api', orderRoutes);
 app.use('/api', backupRoutes);
 app.use('/api', salesRoutes);
+app.use('/api', supplierRoutes);
+app.use('/api', inventoryPurchaseRoutes);
 
 // Error Handling
 app.use((err, req, res, next) => {

@@ -48,10 +48,34 @@ const getDailySales = async (req, res) => {
             order: [[literal('date'), 'DESC']]
         });
 
+        // Step 2: Calculate total quantity sold per product
+        const totalProductsSold = {};
+        
+        dailySales.forEach((sale) => {
+            sale.OrderItems.forEach((item) => {
+                const productName = item.Product.productName;
+        
+                if (!totalProductsSold[productName]) {
+                    totalProductsSold[productName] = {
+                        productName,
+                        totalQuantitySold: 0,
+                        totalSalesAmount: 0
+                    };
+                }
+        
+                totalProductsSold[productName].totalQuantitySold += item.quantity;
+                totalProductsSold[productName].totalSalesAmount += item.quantity * item.priceAtTime;
+            });
+        });
+        
+        // Convert totalProductsSold to an array
+        const totalProductsArray = Object.values(totalProductsSold);
+
         const data = {
             totalSales: dailySales.reduce((sum, sale) => sum + (sale.get('totalSales') || 0), 0),  // Safely access totalSales
             totalOrders: dailySales.reduce((sum, sale) => sum + (parseFloat(sale.get('totalOrders')) || 0), 0),  // Safely access totalOrders
-            dailySales: dailySales
+            dailySales: dailySales,
+            totalProductsSold: totalProductsArray
         };
 
         // Check if the request is for a PDF download
@@ -117,10 +141,34 @@ const getWeeklySales = async (req, res) => {
             order: [[literal('week'), 'DESC']]
         });
 
+        // Step 2: Calculate total quantity sold per product
+        const totalProductsSold = {};
+        
+        weeklySales.forEach((sale) => {
+            sale.OrderItems.forEach((item) => {
+                const productName = item.Product.productName;
+        
+                if (!totalProductsSold[productName]) {
+                    totalProductsSold[productName] = {
+                        productName,
+                        totalQuantitySold: 0,
+                        totalSalesAmount: 0
+                    };
+                }
+        
+                totalProductsSold[productName].totalQuantitySold += item.quantity;
+                totalProductsSold[productName].totalSalesAmount += item.quantity * item.priceAtTime;
+            });
+        });
+        
+        // Convert totalProductsSold to an array
+        const totalProductsArray = Object.values(totalProductsSold);
+
         const data = {
             totalSales: weeklySales.reduce((sum, sale) => sum + (sale.get('totalSales') || 0), 0),  // Safely access totalSales
             totalOrders: weeklySales.reduce((sum, sale) => sum + (parseFloat(sale.get('totalOrders')) || 0), 0),  // Safely access totalOrders
-            weeklySales: weeklySales
+            weeklySales: weeklySales,
+            totalProductsSold: totalProductsArray
         };
 
         // Check if the request is for a PDF download
@@ -152,15 +200,15 @@ const getMonthlySales = async (req, res) => {
 
         const monthlySales = await Order.findAll({
             attributes: [
-                [fn('DATE_TRUNC', 'month', col('Order.createdAt')), 'month'], // Specify table name
+                [fn('DATE_TRUNC', 'month', col('Order.createdAt')), 'month'], 
                 [fn('SUM', col('totalPrice')), 'totalSales'],
                 [fn('COUNT', col('Order.id')), 'totalOrders'],
-                'customerName',  // Include customer name
-                'customerPhone'  // Include customer phone
+                'customerName',
+                'customerPhone'
             ],
             where: {
                 createdAt: {
-                    [Op.gte]: literal('CURRENT_DATE - INTERVAL \'1 month\'')
+                    [Op.gte]: literal("CURRENT_DATE - INTERVAL '1 month'")
                 }
             },
             include: [
@@ -185,11 +233,35 @@ const getMonthlySales = async (req, res) => {
             ],
             order: [[literal('month'), 'DESC']]
         });
+        
+        // Step 2: Calculate total quantity sold per product
+        const totalProductsSold = {};
+        
+        monthlySales.forEach((sale) => {
+            sale.OrderItems.forEach((item) => {
+                const productName = item.Product.productName;
+        
+                if (!totalProductsSold[productName]) {
+                    totalProductsSold[productName] = {
+                        productName,
+                        totalQuantitySold: 0,
+                        totalSalesAmount: 0
+                    };
+                }
+        
+                totalProductsSold[productName].totalQuantitySold += item.quantity;
+                totalProductsSold[productName].totalSalesAmount += item.quantity * item.priceAtTime;
+            });
+        });
+        
+        // Convert totalProductsSold to an array
+        const totalProductsArray = Object.values(totalProductsSold);
 
         const data = {
             totalSales: monthlySales.reduce((sum, sale) => sum + (sale.get('totalSales') || 0), 0),  // Safely access totalSales
             totalOrders: monthlySales.reduce((sum, sale) => sum + (parseFloat(sale.get('totalOrders')) || 0), 0),  // Safely access totalOrders
-            monthlySales: monthlySales
+            monthlySales: monthlySales,
+            totalProductsSold: totalProductsArray
         };
 
         // Check if the request is for a PDF download
@@ -266,12 +338,36 @@ const getCustomSales = async (req, res) => {
             order: [[literal('date'), 'DESC']]
         });
 
+        // Step 2: Calculate total quantity sold per product
+        const totalProductsSold = {};
+        
+        customSales.forEach((sale) => {
+            sale.OrderItems.forEach((item) => {
+                const productName = item.Product.productName;
+        
+                if (!totalProductsSold[productName]) {
+                    totalProductsSold[productName] = {
+                        productName,
+                        totalQuantitySold: 0,
+                        totalSalesAmount: 0
+                    };
+                }
+        
+                totalProductsSold[productName].totalQuantitySold += item.quantity;
+                totalProductsSold[productName].totalSalesAmount += item.quantity * item.priceAtTime;
+            });
+        });
+        
+        // Convert totalProductsSold to an array
+        const totalProductsArray = Object.values(totalProductsSold);
+
         const data = {
             startDate: startDate,
             endDate: endDate,
             totalSales: customSales.reduce((sum, sale) => sum + (sale.get('totalSales') || 0), 0),  // Safely access totalSales
             totalOrders: customSales.reduce((sum, sale) => sum + (parseFloat(sale.get('totalOrders')) || 0), 0),  // Safely access totalOrders
-            customSales: customSales
+            customSales: customSales,
+            totalProductsSold: totalProductsArray
         };
 
         // Check if the request is for a PDF download

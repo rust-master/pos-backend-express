@@ -17,7 +17,8 @@ const generateDailySalesPdf = (data) => {
 
     const docDefinition = {
         content: [
-            { text: 'Daily Sales Report', style: 'header' },
+            { text: 'Report Date: ' + new Date().toLocaleDateString(), style: 'dateStyle', alignment: 'right' },
+            { text: 'Daily Sales Report', style: 'header', alignment: 'center' },
             { text: `Total Sales: $${data.totalSales.toFixed(2)}`, style: 'subheader' },
             { text: `Total Orders: ${data.totalOrders}`, style: 'subheader' },
             { text: 'Daily Sales Details:', style: 'subheader' },
@@ -35,7 +36,7 @@ const generateDailySalesPdf = (data) => {
                             { text: 'Price at Time', bold: true, fillColor: '#eeeeee', alignment: 'center' },
                             { text: 'Total Sales', bold: true, fillColor: '#eeeeee', alignment: 'center' }
                         ],
-                        ...data.dailySales.flatMap((sale, index) => 
+                        ...data.dailySales.flatMap((sale, index) =>
                             sale.OrderItems.map(item => [
                                 { text: sale.get('date'), alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
                                 { text: sale.customerName, alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
@@ -48,9 +49,35 @@ const generateDailySalesPdf = (data) => {
                         )
                     ]
                 }
-            }
+            },
+            { text: 'Total Products Sold:', style: 'subheaderProductSold', },
+            {
+                table: {
+                    headerRows: 1,
+                    widths: ['40%', '30%', '30%'],
+                    body: [
+                        [
+                            { text: 'Product Name', bold: true, fillColor: '#eeeeee', alignment: 'center' },
+                            { text: 'Total Quantity Sold', bold: true, fillColor: '#eeeeee', alignment: 'center' },
+                            { text: 'Total Sales Amount', bold: true, fillColor: '#eeeeee', alignment: 'center' },
+                        ],
+                        ...data.totalProductsSold.map((sold, index) => {
+                            return [
+                                { text: sold.productName, alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
+                                { text: sold.totalQuantitySold, alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
+                                { text: `$${sold.totalSalesAmount.toFixed(2)}`, alignment: 'right', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
+                            ];
+                        })
+                    ]
+                }
+            },
         ],
         styles: {
+            dateStyle: {
+                fontSize: 12,
+                bold: false,
+                margin: [0, 5, 0, 10]
+            },
             header: {
                 fontSize: 18,
                 bold: true,
@@ -60,6 +87,11 @@ const generateDailySalesPdf = (data) => {
                 fontSize: 14,
                 bold: true,
                 margin: [0, 10, 0, 5]
+            },
+            subheaderProductSold: {
+                fontSize: 14,
+                bold: true,
+                margin: [0, 20, 0, 5]
             }
         }
     };
@@ -81,7 +113,8 @@ const generateWeeklySalesPdf = (data) => {
 
     const docDefinition = {
         content: [
-            { text: 'Weekly Sales Report', style: 'header' },
+            { text: 'Report Date: ' + new Date().toLocaleDateString(), style: 'dateStyle', alignment: 'right' },
+            { text: 'Weekly Sales Report', style: 'header', alignment: 'center' },
             { text: `Total Sales: $${data.totalSales.toFixed(2)}`, style: 'subheader' },
             { text: `Total Orders: ${data.totalOrders}`, style: 'subheader' },
             { text: 'Weekly Sales Details:', style: 'subheader' },
@@ -99,7 +132,7 @@ const generateWeeklySalesPdf = (data) => {
                             { text: 'Price at Time', bold: true, fillColor: '#eeeeee', alignment: 'center' },
                             { text: 'Total Sales', bold: true, fillColor: '#eeeeee', alignment: 'center' }
                         ],
-                        ...data.weeklySales.flatMap((sale, index) => 
+                        ...data.weeklySales.flatMap((sale, index) =>
                             sale.OrderItems.map(item => [
                                 { text: sale.get('week').toISOString().slice(0, 10), alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
                                 { text: sale.customerName, alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
@@ -112,9 +145,35 @@ const generateWeeklySalesPdf = (data) => {
                         )
                     ]
                 }
-            }
+            },
+            { text: 'Total Products Sold:', style: 'subheaderProductSold', },
+            {
+                table: {
+                    headerRows: 1,
+                    widths: ['40%', '30%', '30%'],
+                    body: [
+                        [
+                            { text: 'Product Name', bold: true, fillColor: '#eeeeee', alignment: 'center' },
+                            { text: 'Total Quantity Sold', bold: true, fillColor: '#eeeeee', alignment: 'center' },
+                            { text: 'Total Sales Amount', bold: true, fillColor: '#eeeeee', alignment: 'center' },
+                        ],
+                        ...data.totalProductsSold.map((sold, index) => {
+                            return [
+                                { text: sold.productName, alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
+                                { text: sold.totalQuantitySold, alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
+                                { text: `$${sold.totalSalesAmount.toFixed(2)}`, alignment: 'right', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
+                            ];
+                        })
+                    ]
+                }
+            },
         ],
         styles: {
+            dateStyle: {
+                fontSize: 12,
+                bold: false,
+                margin: [0, 5, 0, 10]
+            },
             header: {
                 fontSize: 18,
                 bold: true,
@@ -124,6 +183,11 @@ const generateWeeklySalesPdf = (data) => {
                 fontSize: 14,
                 bold: true,
                 margin: [0, 10, 0, 5]
+            },
+            subheaderProductSold: {
+                fontSize: 14,
+                bold: true,
+                margin: [0, 20, 0, 5]
             }
         }
     };
@@ -145,7 +209,8 @@ const generateMonthlySalesPdf = (data) => {
 
     const docDefinition = {
         content: [
-            { text: 'Monthly Sales Report', style: 'header' },
+            { text: 'Report Date: ' + new Date().toLocaleDateString(), style: 'dateStyle', alignment: 'right' },
+            { text: 'Monthly Sales Report', style: 'header', alignment: 'center' },
             { text: `Total Sales: $${data.totalSales.toFixed(2)}`, style: 'subheader' },
             { text: `Total Orders: ${data.totalOrders}`, style: 'subheader' },
             { text: 'Monthly Sales Details:', style: 'subheader' },
@@ -163,7 +228,7 @@ const generateMonthlySalesPdf = (data) => {
                             { text: 'Price at Time', bold: true, fillColor: '#eeeeee', alignment: 'center' },
                             { text: 'Total Sales', bold: true, fillColor: '#eeeeee', alignment: 'center' }
                         ],
-                        ...data.monthlySales.flatMap((sale, index) => 
+                        ...data.monthlySales.flatMap((sale, index) =>
                             sale.OrderItems.map(item => [
                                 { text: sale.get('month').toISOString().slice(0, 7), alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null }, // Zebra striping
                                 { text: sale.customerName, alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
@@ -176,9 +241,35 @@ const generateMonthlySalesPdf = (data) => {
                         )
                     ]
                 }
-            }
+            },
+            { text: 'Total Products Sold:', style: 'subheaderProductSold', },
+            {
+                table: {
+                    headerRows: 1,
+                    widths: ['40%', '30%', '30%'],
+                    body: [
+                        [
+                            { text: 'Product Name', bold: true, fillColor: '#eeeeee', alignment: 'center' },
+                            { text: 'Total Quantity Sold', bold: true, fillColor: '#eeeeee', alignment: 'center' },
+                            { text: 'Total Sales Amount', bold: true, fillColor: '#eeeeee', alignment: 'center' },
+                        ],
+                        ...data.totalProductsSold.map((sold, index) => {
+                            return [
+                                { text: sold.productName, alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
+                                { text: sold.totalQuantitySold, alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
+                                { text: `$${sold.totalSalesAmount.toFixed(2)}`, alignment: 'right', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
+                            ];
+                        })
+                    ]
+                }
+            },
         ],
         styles: {
+            dateStyle: {
+                fontSize: 12,
+                bold: false,
+                margin: [0, 5, 0, 10]
+            },
             header: {
                 fontSize: 18,
                 bold: true,
@@ -188,6 +279,11 @@ const generateMonthlySalesPdf = (data) => {
                 fontSize: 14,
                 bold: true,
                 margin: [0, 10, 0, 5]
+            },
+            subheaderProductSold: {
+                fontSize: 14,
+                bold: true,
+                margin: [0, 20, 0, 5]
             }
         }
     };
@@ -209,7 +305,8 @@ const generateCustomPdf = (data) => {
 
     const docDefinition = {
         content: [
-            { text: 'Custom Sales Report', style: 'header' },
+            { text: 'Report Date: ' + new Date().toLocaleDateString(), style: 'dateStyle', alignment: 'right' },
+            { text: 'Custom Sales Report', style: 'header', alignment: 'center' },
             { text: `From ${data.startDate.toDateString()} to ${data.endDate.toDateString()}`, style: 'subheader' },
             { text: `Total Sales: $${data.totalSales.toFixed(2)}`, style: 'subheader' },
             { text: `Total Orders: ${data.totalOrders}`, style: 'subheader' },
@@ -228,7 +325,7 @@ const generateCustomPdf = (data) => {
                             { text: 'Price at Time', bold: true, fillColor: '#eeeeee', alignment: 'center' },
                             { text: 'Total Sales', bold: true, fillColor: '#eeeeee', alignment: 'center' }
                         ],
-                        ...data.customSales.flatMap((sale, index) => 
+                        ...data.customSales.flatMap((sale, index) =>
                             sale.OrderItems.map(item => [
                                 { text: sale.get('date'), alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null }, // Zebra striping
                                 { text: sale.customerName, alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
@@ -244,9 +341,35 @@ const generateCustomPdf = (data) => {
                 layout: {
                     fillColor: (rowIndex) => (rowIndex === 0 ? '#eeeeee' : null) // Ensures header row has background color
                 }
-            }            
+            },
+            { text: 'Total Products Sold:', style: 'subheaderProductSold', },
+            {
+                table: {
+                    headerRows: 1,
+                    widths: ['40%', '30%', '30%'],
+                    body: [
+                        [
+                            { text: 'Product Name', bold: true, fillColor: '#eeeeee', alignment: 'center' },
+                            { text: 'Total Quantity Sold', bold: true, fillColor: '#eeeeee', alignment: 'center' },
+                            { text: 'Total Sales Amount', bold: true, fillColor: '#eeeeee', alignment: 'center' },
+                        ],
+                        ...data.totalProductsSold.map((sold, index) => {
+                            return [
+                                { text: sold.productName, alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
+                                { text: sold.totalQuantitySold, alignment: 'center', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
+                                { text: `$${sold.totalSalesAmount.toFixed(2)}`, alignment: 'right', fillColor: index % 2 === 0 ? '#f9f9f9' : null },
+                            ];
+                        })
+                    ]
+                }
+            },
         ],
         styles: {
+            dateStyle: {
+                fontSize: 12,
+                bold: false,
+                margin: [0, 5, 0, 10]
+            },
             header: {
                 fontSize: 18,
                 bold: true,
@@ -256,6 +379,11 @@ const generateCustomPdf = (data) => {
                 fontSize: 14,
                 bold: true,
                 margin: [0, 10, 0, 5]
+            },
+            subheaderProductSold: {
+                fontSize: 14,
+                bold: true,
+                margin: [0, 20, 0, 5]
             }
         }
     };

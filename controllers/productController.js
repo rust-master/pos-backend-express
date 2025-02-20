@@ -1,15 +1,5 @@
 const Product = require('../models/Product');
 
-// ✅ Create a Product (Admin Only)
-// const createProduct = async (req, res) => {
-//     try {
-//         const { productName, productDescription, price, quantity } = req.body;
-//         const newProduct = await Product.create({ productName, productDescription, price, quantity });
-//         res.status(201).json(newProduct);
-//     } catch (err) {
-//         res.status(500).json({ message: err.message });
-//     }
-// };
 // ✅ Create Product (Admin Only)
 const createProduct = async (req, res) => {
     try {
@@ -22,8 +12,6 @@ const createProduct = async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 };
-
-module.exports = { createProduct };
 
 // ✅ Get All Products (Public)
 const getAllProducts = async (req, res) => {
