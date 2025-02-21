@@ -1,17 +1,40 @@
 const PdfPrinter = require('pdfmake');
-const fs = require('fs');
-const htmlPdf = require('html-pdf');
 
+// Define common fonts
+const fonts = {
+    Roboto: {
+        normal: 'fonts/Roboto-Regular.ttf',
+        bold: 'fonts/Roboto-Medium.ttf',
+        italics: 'fonts/Roboto-Italic.ttf',
+        bolditalics: 'fonts/Roboto-MediumItalic.ttf'
+    }
+};
+
+// Common styles
+const styles = {
+    dateStyle: {
+        fontSize: 12,
+        bold: false,
+        margin: [0, 5, 0, 10]
+    },
+    header: {
+        fontSize: 18,
+        bold: true,
+        margin: [0, 0, 0, 10]
+    },
+    subheader: {
+        fontSize: 14,
+        bold: true,
+        margin: [0, 10, 0, 5]
+    },
+    subheaderProductSold: {
+        fontSize: 14,
+        bold: true,
+        margin: [0, 20, 0, 5]
+    }
+};
 
 const generateDailySalesPdf = (data) => {
-    const fonts = {
-        Roboto: {
-            normal: 'fonts/Roboto-Regular.ttf',
-            bold: 'fonts/Roboto-Medium.ttf',
-            italics: 'fonts/Roboto-Italic.ttf',
-            bolditalics: 'fonts/Roboto-MediumItalic.ttf'
-        }
-    };
 
     const printer = new PdfPrinter(fonts);
 
@@ -72,42 +95,13 @@ const generateDailySalesPdf = (data) => {
                 }
             },
         ],
-        styles: {
-            dateStyle: {
-                fontSize: 12,
-                bold: false,
-                margin: [0, 5, 0, 10]
-            },
-            header: {
-                fontSize: 18,
-                bold: true,
-                margin: [0, 0, 0, 10]
-            },
-            subheader: {
-                fontSize: 14,
-                bold: true,
-                margin: [0, 10, 0, 5]
-            },
-            subheaderProductSold: {
-                fontSize: 14,
-                bold: true,
-                margin: [0, 20, 0, 5]
-            }
-        }
+        styles
     };
 
     return printer.createPdfKitDocument(docDefinition);
 };
 
 const generateWeeklySalesPdf = (data) => {
-    const fonts = {
-        Roboto: {
-            normal: 'fonts/Roboto-Regular.ttf',
-            bold: 'fonts/Roboto-Medium.ttf',
-            italics: 'fonts/Roboto-Italic.ttf',
-            bolditalics: 'fonts/Roboto-MediumItalic.ttf'
-        }
-    };
 
     const printer = new PdfPrinter(fonts);
 
@@ -168,42 +162,13 @@ const generateWeeklySalesPdf = (data) => {
                 }
             },
         ],
-        styles: {
-            dateStyle: {
-                fontSize: 12,
-                bold: false,
-                margin: [0, 5, 0, 10]
-            },
-            header: {
-                fontSize: 18,
-                bold: true,
-                margin: [0, 0, 0, 10]
-            },
-            subheader: {
-                fontSize: 14,
-                bold: true,
-                margin: [0, 10, 0, 5]
-            },
-            subheaderProductSold: {
-                fontSize: 14,
-                bold: true,
-                margin: [0, 20, 0, 5]
-            }
-        }
+        styles
     };
 
     return printer.createPdfKitDocument(docDefinition);
 };
 
 const generateMonthlySalesPdf = (data) => {
-    const fonts = {
-        Roboto: {
-            normal: 'fonts/Roboto-Regular.ttf',
-            bold: 'fonts/Roboto-Medium.ttf',
-            italics: 'fonts/Roboto-Italic.ttf',
-            bolditalics: 'fonts/Roboto-MediumItalic.ttf'
-        }
-    };
 
     const printer = new PdfPrinter(fonts);
 
@@ -264,42 +229,13 @@ const generateMonthlySalesPdf = (data) => {
                 }
             },
         ],
-        styles: {
-            dateStyle: {
-                fontSize: 12,
-                bold: false,
-                margin: [0, 5, 0, 10]
-            },
-            header: {
-                fontSize: 18,
-                bold: true,
-                margin: [0, 0, 0, 10]
-            },
-            subheader: {
-                fontSize: 14,
-                bold: true,
-                margin: [0, 10, 0, 5]
-            },
-            subheaderProductSold: {
-                fontSize: 14,
-                bold: true,
-                margin: [0, 20, 0, 5]
-            }
-        }
+        styles
     };
 
     return printer.createPdfKitDocument(docDefinition);
 };
 
 const generateCustomPdf = (data) => {
-    const fonts = {
-        Roboto: {
-            normal: 'fonts/Roboto-Regular.ttf',
-            bold: 'fonts/Roboto-Medium.ttf',
-            italics: 'fonts/Roboto-Italic.ttf',
-            bolditalics: 'fonts/Roboto-MediumItalic.ttf'
-        }
-    };
 
     const printer = new PdfPrinter(fonts);
 
@@ -364,28 +300,7 @@ const generateCustomPdf = (data) => {
                 }
             },
         ],
-        styles: {
-            dateStyle: {
-                fontSize: 12,
-                bold: false,
-                margin: [0, 5, 0, 10]
-            },
-            header: {
-                fontSize: 18,
-                bold: true,
-                margin: [0, 0, 0, 10]
-            },
-            subheader: {
-                fontSize: 14,
-                bold: true,
-                margin: [0, 10, 0, 5]
-            },
-            subheaderProductSold: {
-                fontSize: 14,
-                bold: true,
-                margin: [0, 20, 0, 5]
-            }
-        }
+        styles
     };
 
     return printer.createPdfKitDocument(docDefinition);

@@ -1,10 +1,17 @@
-const InventoryPurchase = require('../models/InventoryPurchase');
+const sequelize  = require('../config/database'); // Import sequelize for transactions
+const PurchaseOrder = require('../models/PurchaseOrder');
 const Supplier = require('../models/Supplier');
 const Product = require('../models/Product');
+const PurchaseOrderItems = require('../models/PurchaseOrderItems');
 
 const createInventoryPurchase = async (req, res) => {
+    const transaction = await sequelize.transaction(); // Start a transaction
     try {
-        const { supplierId, products } = req.body;
+        const { supplierId, items } = req.body;
+
+        if (!supplierId || !Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({ message: "Invalid request: supplierId and items are required" });
+        }
 
         // Validate supplier exists
         const supplier = await Supplier.findByPk(supplierId);
@@ -12,70 +19,126 @@ const createInventoryPurchase = async (req, res) => {
             return res.status(404).json({ message: "Supplier not found" });
         }
 
-        // Validate all products exist in the database
-        const productIds = products.map(p => p.productId);
-        const existingProducts = await Product.findAll({ where: { id: productIds } });
+        // Fetch products from DB
+        const productIds = items.map(item => item.productId);
+        const products = await Product.findAll({ where: { id: productIds } });
 
-        if (existingProducts.length !== products.length) {
-            return res.status(400).json({ message: "Some products do not exist in the database" });
+        if (products.length !== productIds.length) {
+            const foundProductIds = products.map(p => p.id);
+            const missingProductIds = productIds.filter(id => !foundProductIds.includes(id));
+            return res.status(400).json({ message: `Products not found: ${missingProductIds.join(', ')}` });
         }
 
         // Calculate total quantity
-        const totalQuantity = products.reduce((sum, p) => sum + p.quantity, 0);
+        let totalQuantity = 0;
+        const purchaseItems = [];
+
+        for (const item of items) {
+            const product = products.find(p => p.id === item.productId);
+            if (!product) {
+                return res.status(400).json({ message: `Product with ID ${item.productId} not found` });
+            }
+            if (!item.quantity || item.quantity <= 0) {
+                return res.status(400).json({ message: `Invalid quantity for product ${item.productId}` });
+            }
+
+            totalQuantity += item.quantity;
+            purchaseItems.push({
+                purchaseId: null, // Will be set after purchase order creation
+                productId: item.productId,
+                quantity: item.quantity,
+            });
+        }
 
         // Create inventory purchase
-        const newPurchase = await InventoryPurchase.create({
+        const newPurchase = await PurchaseOrder.create({
             supplierId,
-            products,
             totalQuantity
+        }, { transaction });
+
+        // Assign purchaseId to purchaseItems and bulk insert
+        purchaseItems.forEach(item => item.purchaseId = newPurchase.id);
+        const newPurchaseOrderItems =  await PurchaseOrderItems.bulkCreate(purchaseItems, { transaction });
+
+        await transaction.commit(); // Commit the transaction
+        return res.status(201).json({
+            message: "Inventory purchase created successfully",
+            data: {newPurchase, newPurchaseOrderItems}
         });
 
-        return res.status(201).json({ message: "Inventory purchase created successfully", data: newPurchase });
     } catch (error) {
+        await transaction.rollback(); // Rollback in case of error
         return res.status(500).json({ message: "Server error", error: error.message });
     }
 };
 
 const getAllInventoryPurchases = async (req, res) => {
     try {
-        const purchases = await InventoryPurchase.findAll({
+        const purchases = await PurchaseOrder.findAll({
             include: [
-                { model: Supplier },
-
+                {
+                    model: Supplier,
+                    attributes: ['id', 'supplierName', 'contactPerson', 'phone', 'email', 'address', 'productsType']
+                },
+                {
+                    model: PurchaseOrderItems,
+                    attributes: ['id', 'quantity'],
+                    include: [
+                        {
+                            model: Product,
+                            attributes: ['id', 'productName', 'productDescription', 'price', 'imageUrl']
+                        }
+                    ]
+                }
             ],
-
-            // include: [
-            //     { model: Supplier, attributes: ['id', 'supplierName', 'contactPerson', 'phone', 'email'] }
-            // ]
+            order: [['createdAt', 'DESC']] // Order by latest purchases
         });
 
+        return res.status(200).json({ message: "Purchase orders retrieved successfully", data: purchases });
+    } catch (error) {
+        return res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
 
+const getInventoryPurchaseById = async (req, res) => {
+    try {
+        const { purchaseId } = req.params;
 
-        // Fetch product details for each purchase
-        const purchasesWithProducts = await Promise.all(purchases.map(async (purchase) => {
-            if (!purchase.products || purchase.products.length === 0) {
-                return { ...purchase.toJSON(), Products: [] };
-            }
+        // Fetch the purchase order with associated supplier, items, and product details
+        const purchase = await PurchaseOrder.findByPk(purchaseId, {
+            include: [
+                {
+                    model: Supplier,
+                    attributes: ['id', 'supplierName', 'contactPerson', 'phone', 'email', 'address', 'productsType']
+                },
+                {
+                    model: PurchaseOrderItems,
+                    attributes: ['id', 'quantity'],
+                    include: [
+                        {
+                            model: Product,
+                            attributes: ['id', 'productName', 'productDescription', 'price', 'imageUrl']
+                        }
+                    ]
+                }
+            ]
+        });
 
-            const products = await Promise.all(purchase.products.map(async (product) => {
-                const productDetails = await Product.findByPk(product.productId);
-                return productDetails || { productId: product.productId, error: "Product not found" };
-            }));
+        // If the purchase order is not found
+        if (!purchase) {
+            return res.status(404).json({ message: "Purchase order not found" });
+        }
 
-            return {
-                ...purchase.toJSON(),
-                ProductsDetail: products
-            };
-        }));
-
-        return res.status(200).json({ message: "All purchases retrieved", data: purchasesWithProducts });
+        return res.status(200).json({ message: "Purchase order retrieved successfully", data: purchase });
     } catch (error) {
         return res.status(500).json({ message: "Server error", error: error.message });
     }
 };
 
 
+
 module.exports = {
     createInventoryPurchase,
-    getAllInventoryPurchases
+    getAllInventoryPurchases,
+    getInventoryPurchaseById
 };

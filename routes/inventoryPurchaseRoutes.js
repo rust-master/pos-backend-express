@@ -5,6 +5,8 @@ const inventoryPurchaseController = require('../controllers/inventoryPurchaseCon
 const router = express.Router();
 
 router.post('/inventory-purchase', authenticateJWT, authorizeRole(true), inventoryPurchaseController.createInventoryPurchase);
-router.get('/inventory-purchase', inventoryPurchaseController.getAllInventoryPurchases);
+router.get('/inventory-purchase', authenticateJWT, authorizeRole(true), inventoryPurchaseController.getAllInventoryPurchases);
+router.get('/inventory-purchase/:purchaseId', authenticateJWT, authorizeRole(true), inventoryPurchaseController.getInventoryPurchaseById);
+
 
 module.exports = router;

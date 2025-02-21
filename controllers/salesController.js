@@ -1,10 +1,7 @@
 const { Op, fn, col, literal } = require('sequelize');
 const Order = require('../models/Order');
 const OrderItems = require('../models/OrderItems');
-const Product = require('../models/Product');
-const PdfPrinter = require('pdfmake');
-const fs = require('fs');
-const htmlPdf = require('html-pdf');
+const Product = require('../models/Product')
 const { generateCustomPdf, generateMonthlySalesPdf, generateWeeklySalesPdf, generateDailySalesPdf } = require('../utils/pdfGenerator');
 
 // 🗓️ Get Daily Sales Report (with Order Items & Product Info)

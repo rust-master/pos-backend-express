@@ -6,9 +6,19 @@ const backupCronJob = () => {
         console.log('⏳ Starting database backup...');
 
         try {
-            const result = await backupDatabase({}, { status: () => ({ json: () => {} }) }); // Mock req & res
-            console.log(result);
-            console.log('✅ Database backup completed successfully!');
+            let responseData;
+            
+            // Custom response object to capture data
+            const mockRes = {
+                status: (code) => ({
+                    json: (data) => {
+                        responseData = { status: code, data };
+                    },
+                }),
+            };
+
+            await backupDatabase({}, mockRes);
+            console.log('✅ Database backup completed successfully!', responseData);
         } catch (err) {
             console.error('❌ Error backup database:', err.message);
         }

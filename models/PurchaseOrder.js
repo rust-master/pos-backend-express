@@ -3,7 +3,7 @@ const sequelize = require('../config/database');
 const { v4: uuidv4 } = require('uuid');
 const Supplier = require('./Supplier');
 
-const InventoryPurchase = sequelize.define('InventoryPurchase', {
+const PurchaseOrder = sequelize.define('PurchaseOrder', {
     id: {
         type: DataTypes.UUID,
         defaultValue: uuidv4,
@@ -17,17 +17,6 @@ const InventoryPurchase = sequelize.define('InventoryPurchase', {
             key: 'id'
         }
     },
-    products: {
-        type: DataTypes.JSON,
-        allowNull: false,
-        validate: {
-            isArray(value) {
-                if (!Array.isArray(value)) {
-                    throw new Error('Products must be an array');
-                }
-            }
-        }
-    },
     totalQuantity: {
         type: DataTypes.INTEGER,
         allowNull: false
@@ -37,7 +26,7 @@ const InventoryPurchase = sequelize.define('InventoryPurchase', {
 });
 
 // Define associations
-Supplier.hasMany(InventoryPurchase, { foreignKey: 'supplierId', onDelete: 'CASCADE' });
-InventoryPurchase.belongsTo(Supplier, { foreignKey: 'supplierId' });
+Supplier.hasMany(PurchaseOrder, { foreignKey: 'supplierId', onDelete: 'CASCADE' });
+PurchaseOrder.belongsTo(Supplier, { foreignKey: 'supplierId' });
 
-module.exports = InventoryPurchase;
+module.exports = PurchaseOrder;

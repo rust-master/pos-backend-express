@@ -6,6 +6,9 @@ const User = require('../models/User');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
 const OrderItems = require('../models/OrderItems');
+const Supplier = require('../models/Supplier');
+const PurchaseOrder = require('../models/PurchaseOrder');
+const PurchaseOrderItems = require('../models/PurchaseOrderItems');
 
 const ENCRYPTION_KEY = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
 const IV_LENGTH = 16;
@@ -36,12 +39,18 @@ const backupDatabase = async (req, res) => {
         const products = await Product.findAll();
         const orders = await Order.findAll();
         const orderItems = await OrderItems.findAll();
+        const suppliers = await Supplier.findAll();
+        const purchaseOrder = await PurchaseOrder.findAll();
+        const purchaseOrderItems = await PurchaseOrderItems.findAll();
 
         const backupData = {
             users,
             products,
             orders,
-            orderItems
+            orderItems,
+            suppliers,
+            purchaseOrder,
+            purchaseOrderItems,
         };
 
         const encryptedData = encrypt(JSON.stringify(backupData));
@@ -80,6 +89,15 @@ const restoreDatabase = async (req, res) => {
 
         // Restore Orders
         await OrderItems.bulkCreate(decryptedData.orderItems);
+
+        // Restore Suppliers
+        await Supplier.bulkCreate(decryptedData.suppliers);
+
+        // Restore Purchase Orders
+        await PurchaseOrder.bulkCreate(decryptedData.purchaseOrder);
+
+        // Restore Purchase Order Items
+        await PurchaseOrderItems.bulkCreate(decryptedData.purchaseOrderItems);
 
         res.status(200).json({ message: '✅ Database restored successfully!' });
     } catch (err) {

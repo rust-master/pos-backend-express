@@ -18,7 +18,7 @@ const { stockCheckerCronJob } = require('./jobs/stockCheckerCronJob');
 const { backupCronJob } = require('./jobs/backupCronJob');
 
 stockCheckerCronJob();
-// backupCronJob();
+backupCronJob();
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -30,7 +30,15 @@ app.use(expressSession({
     cookie: { secure: true } // Set to true if using HTTPS
 }));
 
-app.use(cors());
+console.log("process.env.ALLOWED_ORIGIN",process.env.ALLOWED_ORIGIN)
+
+app.use(cors({
+    origin: process.env.ALLOWED_ORIGIN, // Load allowed origin from environment variable
+    credentials: true, // Allow cookies and authentication headers
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'] // Allowed headers
+}));
+
 app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
