@@ -1,8 +1,9 @@
-const sequelize  = require('../config/database'); // Import sequelize for transactions
+const sequelize = require('../config/database'); // Import sequelize for transactions
 const PurchaseOrder = require('../models/PurchaseOrder');
 const Supplier = require('../models/Supplier');
 const Product = require('../models/Product');
 const PurchaseOrderItems = require('../models/PurchaseOrderItems');
+const { generateInventoryPurchasePdf } = require('../utils/pdfGenerator');
 
 const createInventoryPurchase = async (req, res) => {
     const transaction = await sequelize.transaction(); // Start a transaction
@@ -58,12 +59,12 @@ const createInventoryPurchase = async (req, res) => {
 
         // Assign purchaseId to purchaseItems and bulk insert
         purchaseItems.forEach(item => item.purchaseId = newPurchase.id);
-        const newPurchaseOrderItems =  await PurchaseOrderItems.bulkCreate(purchaseItems, { transaction });
+        const newPurchaseOrderItems = await PurchaseOrderItems.bulkCreate(purchaseItems, { transaction });
 
         await transaction.commit(); // Commit the transaction
         return res.status(201).json({
             message: "Inventory purchase created successfully",
-            data: {newPurchase, newPurchaseOrderItems}
+            data: { newPurchase, newPurchaseOrderItems }
         });
 
     } catch (error) {
@@ -103,6 +104,7 @@ const getAllInventoryPurchases = async (req, res) => {
 const getInventoryPurchaseById = async (req, res) => {
     try {
         const { purchaseId } = req.params;
+        const { download } = req.query;
 
         // Fetch the purchase order with associated supplier, items, and product details
         const purchase = await PurchaseOrder.findByPk(purchaseId, {
@@ -129,7 +131,21 @@ const getInventoryPurchaseById = async (req, res) => {
             return res.status(404).json({ message: "Purchase order not found" });
         }
 
-        return res.status(200).json({ message: "Purchase order retrieved successfully", data: purchase });
+        if (download === 'pdf') {
+            // Generate PDF
+            const pdfDoc = generateInventoryPurchasePdf(purchase);
+
+            // Set response headers for PDF download
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `attachment; filename=inventory-purchase-report.pdf`);
+
+            // Stream the PDF to the client
+            pdfDoc.pipe(res);
+            pdfDoc.end();
+        } else {
+            return res.status(200).json({ message: "Purchase order retrieved successfully", data: purchase });
+        }
+
     } catch (error) {
         return res.status(500).json({ message: "Server error", error: error.message });
     }

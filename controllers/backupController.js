@@ -9,6 +9,7 @@ const OrderItems = require('../models/OrderItems');
 const Supplier = require('../models/Supplier');
 const PurchaseOrder = require('../models/PurchaseOrder');
 const PurchaseOrderItems = require('../models/PurchaseOrderItems');
+const Category = require('../models/Category');
 
 const ENCRYPTION_KEY = Buffer.from(process.env.ENCRYPTION_KEY, 'hex');
 const IV_LENGTH = 16;
@@ -42,6 +43,7 @@ const backupDatabase = async (req, res) => {
         const suppliers = await Supplier.findAll();
         const purchaseOrder = await PurchaseOrder.findAll();
         const purchaseOrderItems = await PurchaseOrderItems.findAll();
+        const categories = await Category.findAll();
 
         const backupData = {
             users,
@@ -51,6 +53,7 @@ const backupDatabase = async (req, res) => {
             suppliers,
             purchaseOrder,
             purchaseOrderItems,
+            categories,
         };
 
         const encryptedData = encrypt(JSON.stringify(backupData));
@@ -80,6 +83,9 @@ const restoreDatabase = async (req, res) => {
 
         // Restore Users
         await User.bulkCreate(decryptedData.users);
+
+        // Restore Categories
+        await Category.bulkCreate(decryptedData.categories);
 
         // Restore Products
         await Product.bulkCreate(decryptedData.products);

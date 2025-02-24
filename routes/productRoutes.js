@@ -21,10 +21,10 @@ router.post('/products', authenticateJWT, authorizeRole(true), upload.single('im
 // router.post('/products', authenticateJWT, authorizeRole(true), productController.createProduct);
 
 // Get All Products (Public)
-router.get('/products', productController.getAllProducts);
+router.get('/products', authenticateJWT, productController.getAllProducts);
 
 // Get Product by ID (Public)
-router.get('/products/:id', authenticateJWT, authorizeRole(true), productController.getProductById);
+router.get('/products/:id',authenticateJWT, productController.getProductById);
 
 // Update Product (Admin Only)
 router.put('/products/:id', authenticateJWT, authorizeRole(true), upload.single('image'), productController.updateProduct);

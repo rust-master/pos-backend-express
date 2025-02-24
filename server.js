@@ -13,6 +13,7 @@ const backupRoutes = require('./routes/backupRoutes');
 const salesRoutes = require('./routes/salesRoutes');
 const supplierRoutes = require('./routes/supplierRoutes');
 const inventoryPurchaseRoutes = require('./routes/inventoryPurchaseRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
 
 const { stockCheckerCronJob } = require('./jobs/stockCheckerCronJob');
 const { backupCronJob } = require('./jobs/backupCronJob');
@@ -51,6 +52,7 @@ app.use('/api', backupRoutes);
 app.use('/api', salesRoutes);
 app.use('/api', supplierRoutes);
 app.use('/api', inventoryPurchaseRoutes);
+app.use('/api', categoryRoutes);
 
 // Error Handling
 app.use((err, req, res, next) => {
