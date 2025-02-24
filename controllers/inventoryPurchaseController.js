@@ -135,9 +135,12 @@ const getInventoryPurchaseById = async (req, res) => {
             // Generate PDF
             const pdfDoc = generateInventoryPurchasePdf(purchase);
 
+            const formattedDateTime =  new Date().toLocaleString('sv-SE').replace(' ', '_').replace(':', '_').replace(':', '_');
+            console.log("🚀 ~ getInventoryPurchaseById ~ formattedDateTime:", formattedDateTime);
+
             // Set response headers for PDF download
             res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', `attachment; filename=inventory-purchase-report.pdf`);
+            res.setHeader('Content-Disposition', `attachment; filename=${formattedDateTime}-inventory-purchase-report.pdf`);
 
             // Stream the PDF to the client
             pdfDoc.pipe(res);
